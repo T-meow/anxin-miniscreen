@@ -1,0 +1,19 @@
+{
+  "name": "anxin-xiaoping-server",
+  "version": "1.0.0",
+  "description": "安心小屏 - 信令服务器和 AI 代理",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

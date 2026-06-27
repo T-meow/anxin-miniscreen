@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="安心小屏">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=yes">
+  <meta name="theme-color" content="#235a69">
+  <meta name="description" content="安心小屏 - 旧手机改造的老人陪伴与远程照护助手">
+  <title>安心小屏</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 模式切换 -->
+    <nav class="mode-switch" role="tablist" aria-label="切换端">
+      <button class="mode-btn active" data-mode="elder" role="tab" aria-selected="true">老人端</button>
+      <button class="mode-btn" data-mode="family" role="tab" aria-selected="false">子女端</button>
+    </nav>
+
+    <!-- 老人端 -->
+    <main id="elder-screen" class="screen active">
+      <header class="elder-header">
+        <div>
+          <p class="kicker">老人模式</p>
+          <h1>早上好，陈阿姨</h1>
+        </div>
+        <div class="time-box">
+          <strong id="clock-time">--:--</strong>
+          <span id="clock-date">--</span>
+        </div>
+      </header>
+
+      <!-- 隐私状态条 -->
+      <section class="privacy-strip" id="privacy-strip">
+        <span class="privacy-light"></span>
+        <span id="privacy-text">摄像头和麦克风未使用</span>
+      </section>
+
+      <!-- 状态面板 -->
+      <section class="status-grid">
+        <article class="info-panel weather-panel">
+          <span class="panel-label">今日天气</span>
+          <strong>21℃ 多云</strong>
+          <p>适合散步，出门记得带外套。</p>
+        </article>
+        <article class="info-panel reminder-panel">
+          <span class="panel-label">下一项提醒</span>
+          <strong id="next-reminder-title">暂无提醒</strong>
+          <p id="next-reminder-meta">子女端可以远程添加提醒。</p>
+        </article>
+      </section>
+
+      <!-- 大按钮功能区 -->
+      <section class="elder-actions" aria-label="老人端功能">
+        <button class="elder-action" data-view="assistant">
+          <span class="action-symbol">问</span>
+          <span>问助手</span>
+        </button>
+        <button class="elder-action" data-view="entertainment">
+          <span class="action-symbol">听</span>
+          <span>听一会儿</span>
+        </button>
+        <button class="elder-action" data-view="reminders">
+          <span class="action-symbol">药</span>
+          <span>今日提醒</span>
+        </button>
+        <button class="elder-action" data-view="family">
+          <span class="action-symbol">话</span>
+          <span>呼叫家人</span>
+        </button>
+        <button class="elder-action danger" data-view="emergency">
+          <span class="action-symbol">急</span>
+          <span>紧急联系</span>
+        </button>
+        <button class="elder-action muted" data-view="settings">
+          <span class="action-symbol">设</span>
+          <span>简单设置</span>
+        </button>
+      </section>
+
+      <!-- 内容抽屉 -->
+      <section class="elder-drawer" id="elder-drawer">
+        <div class="drawer-empty">
+          <strong>请选择一个大按钮</strong>
+          <p>这里会显示问助手、提醒、听一会儿或呼叫家人的内容。</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- 子女端 -->
+    <main id="family-screen" class="screen">
+      <header class="family-header">
+        <div>
+          <p class="kicker">子女端</p>
+          <h1>照护概览</h1>
+        </div>
+        <button class="btn-primary" id="btn-call">发起视频</button>
+      </header>
+
+      <section class="family-overview">
+        <article class="metric-panel">
+          <span>设备状态</span>
+          <strong id="device-status">在线</strong>
+          <p id="last-seen">刚刚有互动</p>
+        </article>
+        <article class="metric-panel">
+          <span>今日提醒</span>
+          <strong id="reminder-count">0 项</strong>
+          <p id="reminder-hint">还没有创建提醒</p>
+        </article>
+        <article class="metric-panel alert" id="alert-panel">
+          <span>需要关注</span>
+          <strong id="alert-count">0 项</strong>
+          <p id="alert-hint">暂无异常</p>
+        </article>
+      </section>
+
+      <section class="family-layout">
+        <form class="reminder-form" id="reminder-form">
+          <div class="form-header">
+            <h2>添加提醒</h2>
+            <button type="button" class="btn-secondary" id="btn-quick">晚 8 点吃药</button>
+          </div>
+          <label>
+            提醒内容
+            <input id="input-title" name="title" type="text" value="吃降压药" autocomplete="off">
+          </label>
+          <div class="form-row">
+            <label>
+              类型
+              <select id="input-type" name="type">
+                <option value="吃药">吃药</option>
+                <option value="喝水">喝水</option>
+                <option value="复诊">复诊</option>
+                <option value="出门">出门</option>
+                <option value="自定义">自定义</option>
+              </select>
+            </label>
+            <label>
+              时间
+              <input id="input-time" name="time" type="time">
+            </label>
+          </div>
+          <label>
+            给老人看的说明
+            <textarea id="input-note" name="note" rows="3">请按医嘱服用，吃过后点"我吃过了"。</textarea>
+          </label>
+          <button class="btn-primary full" type="submit">保存提醒</button>
+        </form>
+
+        <section class="list-panel">
+          <div class="list-header">
+            <h2>今日提醒状态</h2>
+            <span class="sync-badge">已同步</span>
+          </div>
+          <div class="reminder-list" id="family-reminder-list"></div>
+        </section>
+      </section>
+    </main>
+
+    <!-- 模态框层 -->
+    <div class="modal-layer" id="modal-layer" aria-live="assertive"></div>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/reminders.js"></script>
+  <script src="js/assistant.js"></script>
+  <script src="js/entertainment.js"></script>
+  <script src="js/webrtc.js"></script>
+  <script src="js/elder.js"></script>
+  <script src="js/family.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
