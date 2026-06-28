@@ -89,6 +89,7 @@ const Entertainment = {
     if (State.get('demoMode')) {
       this.renderPlayer();
       this.speak(`开始播放：${track.title}`);
+      State.emit('mascot', { state: 'listening' });
       return;
     }
 
@@ -110,6 +111,7 @@ const Entertainment = {
     if (this.isPlaying) {
       this.isPlaying = false;
       if (this.audio) this.audio.pause();
+      State.emit('mascot', { state: 'idle' });
     } else {
       this.isPlaying = true;
       if (this.audio) {
@@ -118,6 +120,7 @@ const Entertainment = {
         this.play(this.currentTrack.id);
         return;
       }
+      State.emit('mascot', { state: 'listening' });
     }
     this.renderPlayer();
   },
@@ -129,6 +132,7 @@ const Entertainment = {
       this.audio.pause();
       this.audio.currentTime = 0;
     }
+    State.emit('mascot', { state: 'idle' });
     this.renderPlayer();
   },
 
