@@ -7,14 +7,16 @@ const Reminders = {
   init() {
     this.checkInterval = setInterval(() => this.check(), 30000); // 每30秒检查一次
     this.renderFamilyList();
-    this.renderElderDrawer();
     this.updateNextReminder();
 
     // 监听状态同步
     State.on('sync', () => {
       this.renderFamilyList();
-      this.renderElderDrawer();
       this.updateNextReminder();
+      // 如果提醒弹窗正打开，也刷新
+      if (Elder.currentView === 'reminders') {
+        this.renderPanel();
+      }
     });
 
     return this;
@@ -42,17 +44,16 @@ const Reminders = {
 
   // 触发提醒弹窗
   trigger(reminder) {
-    // 避免重复触发
     if (reminder.triggered) return;
     State.updateReminder(reminder.id, { triggered: true });
     
-    // 确保在老人端显示
-    const elderScreen = document.getElementById('elder-screen');
-    if (!elderScreen.classList.contains('active')) {
-      // 切换到老人端
-      const elderBtn = document.querySelector('[data-mode="elder"]');
-      if (elderBtn) elderBtn.click();
+    // 如果在子女端，切回老人端
+    if (App.currentMode !== 'elder') {
+      App.switchToElder();
     }
+
+    // 关闭功能弹窗（如果有）
+    Elder.closePanel();
 
     const modal = document.getElementById('modal-layer');
     modal.classList.add('active');
@@ -70,7 +71,6 @@ const Reminders = {
       </div>
     `;
 
-    // 语音播报（如果支持）
     this.speak(`提醒：${reminder.title}。${reminder.note || ''}`);
   },
 
@@ -79,7 +79,6 @@ const Reminders = {
     State.updateReminder(id, { status: 'done', confirmedAt: Date.now() });
     this.closePopup();
     this.renderFamilyList();
-    this.renderElderDrawer();
     this.updateNextReminder();
     this.speak('好的，已记录。');
   },
@@ -111,19 +110,18 @@ const Reminders = {
     }
   },
 
-  // 更新老人端下一项提醒显示
+  // 更新老人端首页提醒信息条
   updateNextReminder() {
     const pending = State.getPendingReminders();
-    const titleEl = document.getElementById('next-reminder-title');
-    const metaEl = document.getElementById('next-reminder-meta');
+    const el = document.getElementById('next-reminder-inline');
+
+    if (!el) return;
 
     if (pending.length === 0) {
-      titleEl.textContent = '暂无提醒';
-      metaEl.textContent = '子女端可以远程添加提醒。';
+      el.textContent = '暂无提醒';
       return;
     }
 
-    // 按时间排序
     pending.sort((a, b) => {
       const [ha, ma] = a.time.split(':').map(Number);
       const [hb, mb] = b.time.split(':').map(Number);
@@ -131,8 +129,7 @@ const Reminders = {
     });
 
     const next = pending[0];
-    titleEl.textContent = `${next.time} ${next.title}`;
-    metaEl.textContent = next.note || '请按时完成';
+    el.textContent = `${next.time} ${next.title}`;
   },
 
   // 更新子女端异常提醒面板
@@ -141,6 +138,8 @@ const Reminders = {
     const countEl = document.getElementById('alert-count');
     const hintEl = document.getElementById('alert-hint');
     const panel = document.getElementById('alert-panel');
+
+    if (!countEl || !hintEl || !panel) return;
 
     if (overdue.length > 0) {
       countEl.textContent = `${overdue.length} 项`;
@@ -162,8 +161,8 @@ const Reminders = {
     const countEl = document.getElementById('reminder-count');
     const hintEl = document.getElementById('reminder-hint');
 
-    countEl.textContent = `${reminders.length} 项`;
-    hintEl.textContent = reminders.length > 0 ? '今日已创建提醒' : '还没有创建提醒';
+    if (countEl) countEl.textContent = `${reminders.length} 项`;
+    if (hintEl) hintEl.textContent = reminders.length > 0 ? '今日已创建提醒' : '还没有创建提醒';
 
     if (reminders.length === 0) {
       container.innerHTML = '<p style="color: var(--muted); text-align: center; padding: 20px;">暂无提醒</p>';
@@ -190,18 +189,15 @@ const Reminders = {
     }).join('');
   },
 
-  // 渲染老人端提醒抽屉
-  renderElderDrawer() {
-    const drawer = document.getElementById('elder-drawer');
-    if (!drawer || drawer.dataset.view !== 'reminders') return;
+  // 渲染老人端提醒列表（在全屏弹窗内）
+  renderPanel() {
+    const body = Elder.getPanelBody();
+    if (!body) return;
 
     const reminders = State.getReminders();
     if (reminders.length === 0) {
-      drawer.innerHTML = `
-        <div class="drawer-empty">
-          <strong>今日暂无提醒</strong>
-          <p>子女端可以远程添加提醒。</p>
-        </div>
+      body.innerHTML = `
+        <p style="color: var(--muted); text-align: center; padding: 40px; font-size: 18px;">今日暂无提醒</p>
       `;
       return;
     }
@@ -209,37 +205,36 @@ const Reminders = {
     const pending = reminders.filter(r => r.status === 'pending');
     const done = reminders.filter(r => r.status === 'done');
 
-    drawer.innerHTML = `
-      <h3 style="margin-bottom: 16px;">今日提醒</h3>
-      ${pending.length > 0 ? `
-        <div style="margin-bottom: 20px;">
-          <h4 style="color: var(--accent); margin-bottom: 8px;">待完成</h4>
-          ${pending.map(r => `
-            <div style="padding: 12px; background: var(--bg); border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent);">
-              <strong style="font-size: 20px;">${r.time} ${r.title}</strong>
-              <p style="margin: 4px 0 0; color: var(--muted);">${r.note || ''}</p>
-            </div>
-          `).join('')}
-        </div>
-      ` : ''}
-      ${done.length > 0 ? `
-        <div>
-          <h4 style="color: var(--accent2); margin-bottom: 8px;">已完成</h4>
-          ${done.map(r => `
-            <div style="padding: 12px; background: var(--bg); border-radius: 8px; margin-bottom: 8px; opacity: 0.7; border-left: 4px solid var(--accent2);">
-              <strong>${r.time} ${r.title}</strong>
-              <span style="color: var(--accent2); margin-left: 8px;">✓ 已完成</span>
-            </div>
-          `).join('')}
-        </div>
-      ` : ''}
+    body.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        ${pending.length > 0 ? `
+          <div>
+            <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 17px;">待完成 (${pending.length})</h4>
+            ${pending.map(r => `
+              <div style="padding: 16px; background: var(--bg2); border-radius: 14px; margin-bottom: 10px; border-left: 5px solid var(--accent);">
+                <strong style="font-size: 20px;">${r.time} ${r.title}</strong>
+                <p style="margin: 6px 0 0; color: var(--muted); font-size: 15px;">${r.note || ''}</p>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+        ${done.length > 0 ? `
+          <div>
+            <h4 style="color: var(--accent2); margin-bottom: 10px; font-size: 17px;">已完成 (${done.length})</h4>
+            ${done.map(r => `
+              <div style="padding: 14px; background: var(--bg2); border-radius: 14px; margin-bottom: 10px; opacity: 0.65; border-left: 5px solid var(--accent2);">
+                <strong>${r.time} ${r.title}</strong>
+                <span style="color: var(--accent2); margin-left: 8px; font-size: 15px;">已完成</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
     `;
   },
 
-  // 显示提醒抽屉
-  showDrawer() {
-    const drawer = document.getElementById('elder-drawer');
-    drawer.dataset.view = 'reminders';
-    this.renderElderDrawer();
+  // 显示提醒面板（从 elder.js 调用）
+  showPanel() {
+    this.renderPanel();
   }
 };

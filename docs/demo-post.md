@@ -48,9 +48,11 @@
 
 ## 3. Demo 体验地址
 
-在线体验地址：[待填入]
+在线体验地址：https://t-meow.github.io/anxin-miniscreen/
 
-如果在线部署临时不可用，我会把 `src/` 目录打包成 ZIP，并在比赛提交时上传 HTML 文件作为备选体验方式。
+> 在浏览器中打开上述链接，即可体验完整 Demo。页面顶部可切换"老人端"和"子女端"。
+
+如果在线部署临时不可用，我也会把 `src/` 目录打包成 ZIP，作为备选体验方式。
 
 ## 4. TRAE 实践过程
 
@@ -76,8 +78,8 @@
 
 Session ID：
 
-- Session 1: [待填入] —— 部署上线与 Demo 帖撰写
-- Session 2: [待填入] —— 代码审查与功能增强
-- Session 3: [待填入] —— PWA 原型核心功能开发
+- Session 1: `1566447778139:7c74be5f88ccada033959adf132c8e01_6a3fba25ab89dddb57ecafe9.6a3fd803ab89dddb57ecb0f5.6a3fd803ab89dddb57ecb0f3` —— 部署上线与 Demo 帖撰写
+- Session 2: `1566447778139:306840416718fc29a2a093936d400e0d_6a3fb978ab89dddb57ecaf91.6a4067f16de0f9f7085c0f3a.6a4067f16de0f9f7085c0f38` —— 代码审查与功能增强
+- Session 3: `1566447778139:f03e5ae37ea122888b480c1f69b9d07d_6a38fae9444ad7f89e38dc96.6a3fb260ab89dddb57ecae45.6a3fb260ab89dddb57ecae43` —— PWA 原型核心功能开发
 
-报名帖链接：[待填入]
+报名帖链接：[待填入社区报名帖 URL]

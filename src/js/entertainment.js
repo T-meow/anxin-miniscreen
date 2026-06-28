@@ -44,32 +44,28 @@ const Entertainment = {
     return this;
   },
 
-  // 显示娱乐界面
+  // 显示娱乐界面（渲染到全屏弹窗）
   show() {
-    const drawer = document.getElementById('elder-drawer');
-    drawer.dataset.view = 'entertainment';
-    this.renderList();
+    const body = Elder.getPanelBody();
+    if (!body) return;
+    this.renderList(body);
   },
 
   // 渲染列表
-  renderList() {
-    const drawer = document.getElementById('elder-drawer');
-    drawer.innerHTML = `
-      <h3 style="margin-bottom: 16px;">听一会儿</h3>
+  renderList(container) {
+    container.innerHTML = `
       <div style="display: flex; flex-direction: column; gap: 12px;">
         ${this.tracks.map(t => `
-          <div style="padding: 16px; background: var(--bg); border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;"
-               onmouseover="this.style.borderColor='var(--accent)'" 
-               onmouseout="this.style.borderColor='transparent'"
-               onclick="Entertainment.play('${t.id}')">
+          <div style="padding: 18px; background: var(--bg2); border-radius: 14px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;"
+               onclick="this.style.borderColor='var(--accent)'; Entertainment.play('${t.id}')">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div>
                 <strong style="font-size: 18px;">${t.title}</strong>
-                <span style="margin-left: 8px; padding: 2px 8px; background: var(--accent); color: white; border-radius: 4px; font-size: 12px;">${t.type === 'story' ? '故事' : '音乐'}</span>
+                <span style="margin-left: 8px; padding: 2px 10px; background: var(--accent); color: white; border-radius: 6px; font-size: 13px;">${t.type === 'story' ? '故事' : '音乐'}</span>
               </div>
               <span style="color: var(--muted); font-size: 14px;">${t.duration}</span>
             </div>
-            <p style="margin: 8px 0 0; color: var(--muted); font-size: 14px;">${t.description}</p>
+            <p style="margin: 8px 0 0; color: var(--muted); font-size: 15px;">${t.description}</p>
           </div>
         `).join('')}
       </div>
@@ -84,7 +80,6 @@ const Entertainment = {
     this.currentTrack = track;
     this.isPlaying = true;
 
-    // 创建音频对象（演示模式使用占位音频）
     if (this.audio) {
       this.audio.pause();
       this.audio = null;
@@ -155,20 +150,21 @@ const Entertainment = {
 
   // 渲染播放器
   renderPlayer() {
-    const drawer = document.getElementById('elder-drawer');
+    const body = Elder.getPanelBody();
+    if (!body) return;
     if (!this.currentTrack) {
-      this.renderList();
+      this.renderList(body);
       return;
     }
 
     const icon = this.currentTrack.type === 'story' ? '📖' : '🎵';
     const playIcon = this.isPlaying ? '⏸' : '▶';
 
-    drawer.innerHTML = `
+    body.innerHTML = `
       <div class="entertainment-player">
         <div class="player-cover">${icon}</div>
-        <h3 style="margin-bottom: 4px;">${this.currentTrack.title}</h3>
-        <p style="color: var(--muted); margin-bottom: 20px;">${this.currentTrack.description}</p>
+        <h3 style="margin-bottom: 4px; font-size: 20px;">${this.currentTrack.title}</h3>
+        <p style="color: var(--muted); margin-bottom: 20px; font-size: 15px;">${this.currentTrack.description}</p>
         
         <div style="width: 100%; height: 4px; background: var(--rule); border-radius: 2px; margin-bottom: 20px;">
           <div style="width: ${this.isPlaying ? '60%' : '0%'}; height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s;"></div>
@@ -181,7 +177,7 @@ const Entertainment = {
           <button class="player-btn" onclick="Entertainment.stop()">⏹</button>
         </div>
         
-        <button class="btn-secondary" style="margin-top: 20px;" onclick="Entertainment.renderList()">返回列表</button>
+        <button class="btn-secondary" style="margin-top: 24px; padding: 12px 24px; font-size: 16px;" onclick="Entertainment.show()">返回列表</button>
       </div>
     `;
   },

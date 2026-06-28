@@ -1,9 +1,11 @@
 /**
  * 安心小屏 - 主应用入口
- * 初始化所有模块，处理模式切换
+ * 初始化所有模块，处理角色选择和模式切换
  */
 
 const App = {
+  currentMode: 'elder',
+
   init() {
     // 初始化状态管理
     State.init();
@@ -16,8 +18,8 @@ const App = {
     Elder.init();
     Family.init();
 
-    // 设置模式切换
-    this.setupModeSwitch();
+    // 设置子女端返回按钮
+    this.setupFamilyBack();
 
     // 加载演示数据
     const hasData = localStorage.getItem('anxin_state');
@@ -25,57 +27,82 @@ const App = {
       State.resetDemo();
     }
 
+    // 检查是否已选择角色
+    const savedRole = localStorage.getItem('anxin_default_role');
+    if (savedRole) {
+      // 隐藏角色选择器
+      document.getElementById('role-picker').classList.add('hidden');
+      // 直接进入对应端
+      if (savedRole === 'family') {
+        this.switchToFamily(true);
+      } else {
+        this.switchToElder();
+      }
+    }
+
     console.log('安心小屏已启动');
   },
 
-  // 设置老人端/子女端切换
-  setupModeSwitch() {
-    const buttons = document.querySelectorAll('.mode-btn');
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const mode = btn.dataset.mode;
-        this.switchMode(mode);
+  // 用户选择角色
+  pickRole(role) {
+    localStorage.setItem('anxin_default_role', role);
+    // 隐藏角色选择器
+    document.getElementById('role-picker').classList.add('hidden');
 
-        // 更新按钮状态
-        buttons.forEach(b => {
-          b.classList.toggle('active', b.dataset.mode === mode);
-          b.setAttribute('aria-selected', b.dataset.mode === mode);
-        });
-      });
-    });
+    if (role === 'family') {
+      this.switchToFamily(true);
+    } else {
+      this.switchToElder();
+    }
   },
 
-  // 切换模式
-  switchMode(mode) {
-    const screens = document.querySelectorAll('.screen');
-    screens.forEach(screen => {
-      screen.classList.remove('active');
-    });
-
-    const targetScreen = document.getElementById(`${mode}-screen`);
-    if (targetScreen) {
-      targetScreen.classList.add('active');
+  // 设置子女端返回按钮
+  setupFamilyBack() {
+    const backBtn = document.getElementById('btn-back-elder');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => this.switchToElder());
     }
+  },
 
-    // 更新状态显示
-    if (mode === 'elder') {
-      Reminders.updateNextReminder();
-    } else if (mode === 'family') {
-      Reminders.renderFamilyList();
-      Reminders.updateAlertPanel();
-    }
+  // 从老人端进入子女端
+  switchToFamily(silent) {
+    // 先关闭弹窗（如果在弹窗内触发的）
+    Elder.closePanel();
+    Elder.closeModal();
 
-    // 清空抽屉
-    const drawer = document.getElementById('elder-drawer');
-    if (drawer && mode === 'elder') {
-      drawer.innerHTML = `
-        <div class="drawer-empty">
-          <strong>请选择一个大按钮</strong>
-          <p>这里会显示问助手、提醒、听一会儿或呼叫家人的内容。</p>
-        </div>
-      `;
-      delete drawer.dataset.view;
+    this.currentMode = 'family';
+
+    // 切换页面
+    document.getElementById('elder-screen').classList.remove('active');
+    document.getElementById('family-screen').classList.add('active');
+
+    // 刷新子女端数据
+    Reminders.renderFamilyList();
+    Reminders.updateAlertPanel();
+
+    if (!silent) {
+      localStorage.setItem('anxin_default_role', 'family');
     }
+  },
+
+  // 从子女端返回老人端
+  switchToElder() {
+    this.currentMode = 'elder';
+
+    // 切换页面
+    document.getElementById('family-screen').classList.remove('active');
+    document.getElementById('elder-screen').classList.add('active');
+
+    // 刷新老人端数据
+    Reminders.updateNextReminder();
+
+    localStorage.setItem('anxin_default_role', 'elder');
+  },
+
+  // 清除角色选择，重新显示选择器
+  resetRole() {
+    localStorage.removeItem('anxin_default_role');
+    location.reload();
   }
 };
 
@@ -101,7 +128,7 @@ function showDemoGuide() {
       <div class="demo-guide-content">
         <h2>欢迎使用安心小屏</h2>
         <div>
-          <p style="margin-bottom: 12px; color: var(--ink);"><strong>这是一个演示版本，展示了以下功能：</strong></p>
+          <p style="margin-bottom: 10px; color: var(--ink);"><strong>这是一个演示版本，展示了以下功能：</strong></p>
           <ol>
             <li><strong>老人端</strong>：大按钮界面，支持问助手、听故事、查看提醒、呼叫家人</li>
             <li><strong>子女端</strong>：远程添加提醒、查看状态、发起视频通话</li>
@@ -110,11 +137,11 @@ function showDemoGuide() {
             <li><strong>视频通话</strong>：完整的呼叫、接听、隐私提示流程</li>
           </ol>
           <div class="guide-tip">
-            <p style="margin: 0; font-size: 14px;"><strong>提示：</strong>点击顶部的"老人端"/"子女端"按钮可以切换视角。建议先切换到<strong>子女端</strong>添加提醒，再回到<strong>老人端</strong>查看。</p>
+            <p style="margin: 0;"><strong>提示：</strong>首次打开会显示角色选择。选"子女"后每次打开会直接进入子女端。点底部"设置"可随时切换。</p>
           </div>
         </div>
         <div style="text-align: center;">
-          <button class="btn-primary" onclick="closeDemoGuide()" style="padding: 12px 32px; font-size: 18px;">开始体验</button>
+          <button class="btn-primary" onclick="closeDemoGuide()" style="padding: 12px 32px; font-size: 17px;">开始体验</button>
         </div>
       </div>
     </div>
@@ -126,10 +153,4 @@ function closeDemoGuide() {
   const modal = document.getElementById('modal-layer');
   modal.innerHTML = '';
   modal.classList.remove('active');
-}
-
-// 重置引导（用于演示）
-function resetGuide() {
-  localStorage.removeItem('anxin_guide_seen');
-  showDemoGuide();
 }

@@ -2,7 +2,7 @@
 
 安心小屏是一款把闲置旧安卓手机改造成老人桌面陪伴屏的纯前端 Demo，通过大字体、大按钮和语音交互降低使用门槛。
 
-在线演示：<https://anxin-xiaoping-demo.vercel.app>（如比赛提交链接变更，可在此替换）
+在线演示：<https://t-meow.github.io/anxin-miniscreen/>
 
 ## 核心功能
 

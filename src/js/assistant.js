@@ -11,17 +11,22 @@ const Assistant = {
     return this;
   },
 
-  // 显示助手界面
+  // 显示助手界面（渲染到全屏弹窗）
   show() {
-    const drawer = document.getElementById('elder-drawer');
-    drawer.dataset.view = 'assistant';
-    this.render();
+    const body = Elder.getPanelBody();
+    if (!body) return;
+    this.render(body);
+
+    // 聚焦输入框
+    setTimeout(() => {
+      const input = document.getElementById('chat-input');
+      if (input) input.focus();
+    }, 300);
   },
 
   // 渲染聊天界面
-  render() {
-    const drawer = document.getElementById('elder-drawer');
-    drawer.innerHTML = `
+  render(container) {
+    container.innerHTML = `
       <div class="assistant-chat" id="chat-messages">
         ${this.messages.length === 0 ? `
           <div class="chat-bubble assistant">
@@ -32,10 +37,10 @@ const Assistant = {
         `).join('')}
       </div>
       <div class="chat-input-row">
-        <input type="text" id="chat-input" placeholder="输入问题，或点击语音按钮说话..." 
+        <input type="text" id="chat-input" placeholder="输入问题，或点语音按钮说话..." 
                onkeypress="if(event.key==='Enter')Assistant.send()">
-        <button class="btn-primary" onclick="Assistant.send()">发送</button>
         <button class="btn-secondary" onclick="Assistant.startVoice()" title="语音输入">🎤</button>
+        <button class="btn-primary" onclick="Assistant.send()">发送</button>
       </div>
     `;
 
@@ -55,7 +60,9 @@ const Assistant = {
     // 添加用户消息
     this.messages.push({ role: 'user', content: text });
     input.value = '';
-    this.render();
+
+    const body = Elder.getPanelBody();
+    if (body) this.render(body);
 
     this.isProcessing = true;
 
@@ -75,7 +82,8 @@ const Assistant = {
       this.messages.push({ role: 'assistant', content: '抱歉，我暂时无法回答，请稍后再试。' });
     } finally {
       this.isProcessing = false;
-      this.render();
+      const body2 = Elder.getPanelBody();
+      if (body2) this.render(body2);
     }
   },
 
@@ -203,7 +211,6 @@ const Assistant = {
   // 语音播报
   speak(text) {
     if ('speechSynthesis' in window) {
-      // 停止之前的播报
       speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'zh-CN';
