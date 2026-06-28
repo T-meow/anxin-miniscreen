@@ -1,0 +1,11 @@
+{
+  "name": "安心小屏",
+  "short_name": "安心小屏",
+  "description": "旧手机改造的老人陪伴与远程照护助手",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f1ec",
+  "theme_color": "#235a69",
+  "lang": "zh-CN"
+}
