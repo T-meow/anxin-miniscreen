@@ -114,4 +114,4 @@ anxin-xiaoping-demo/
 
 ## 许可证
 
-MIT
+本项目采用 [GPLv3](LICENSE) 许可证开源。
