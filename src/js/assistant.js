@@ -65,6 +65,7 @@ const Assistant = {
     if (body) this.render(body);
 
     this.isProcessing = true;
+    State.emit('mascot', { state: 'thinking' });
 
     try {
       // 检查是否是本地可回答的问题
@@ -82,6 +83,8 @@ const Assistant = {
       this.messages.push({ role: 'assistant', content: '抱歉，我暂时无法回答，请稍后再试。' });
     } finally {
       this.isProcessing = false;
+      // 回复完毕，短暂显示说话动画后恢复
+      State.emit('mascot', { state: 'talking', duration: 2000 });
       const body2 = Elder.getPanelBody();
       if (body2) this.render(body2);
     }

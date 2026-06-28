@@ -40,7 +40,36 @@ const App = {
       }
     }
 
+    // 初始化摔倒检测（如果在老人端）
+    if (State.get('fallDetectionEnabled') !== false) {
+      Elder.startFallDetection();
+    }
+
+    // 启动反诈提醒检查（演示模式下快速检查）
+    this.startFraudAlertCheck();
+
     console.log('安心小屏已启动');
+  },
+
+  // 反诈提醒检查：每30秒检查是否有未读提醒需要展示
+  startFraudAlertCheck() {
+    const check = () => {
+      if (App.currentMode !== 'elder') return;
+      const alerts = State.getFraudAlerts();
+      const lastShown = State.get('lastFraudShown');
+      const unread = alerts.filter(a => !a.read);
+      if (unread.length > 0) {
+        // 找到第一个未在老人端展示过的
+        const toShow = unread.find(a => a.id !== lastShown);
+        if (toShow) {
+          State.set('lastFraudShown', toShow.id);
+          Elder.showFraudAlert(toShow);
+        }
+      }
+    };
+    // 首次延迟3秒后检查，之后每30秒检查一次
+    setTimeout(check, 3000);
+    setInterval(check, 30000);
   },
 
   // 用户选择角色
@@ -130,11 +159,13 @@ function showDemoGuide() {
         <div>
           <p style="margin-bottom: 10px; color: var(--ink);"><strong>这是一个演示版本，展示了以下功能：</strong></p>
           <ol>
-            <li><strong>老人端</strong>：大按钮界面，支持问助手、听故事、查看提醒、呼叫家人</li>
-            <li><strong>子女端</strong>：远程添加提醒、查看状态、发起视频通话</li>
-            <li><strong>提醒系统</strong>：到点自动弹窗提醒，老人确认后同步到子女端</li>
-            <li><strong>AI 助手</strong>：回答天气、时间等问题，支持语音输入</li>
-            <li><strong>视频通话</strong>：完整的呼叫、接听、隐私提示流程</li>
+            <li><strong>老人端</strong>：大按钮界面，支持问助手、听故事、查看提醒、呼叫家人、语音留言</li>
+            <li><strong>子女端</strong>：远程添加提醒、查看吃药报告、发起视频通话、查看反诈提醒</li>
+            <li><strong>提醒系统</strong>：到点自动弹窗提醒，支持每日/每周/每月/自定义周期，老人打卡后同步</li>
+            <li><strong>AI 助手</strong>：回答天气、时间等问题，支持语音输入，底部形象会随状态变化</li>
+            <li><strong>视频通话 & 远程监控</strong>：完整的呼叫流程，监控无需老人确认</li>
+            <li><strong>反诈提醒</strong>：定时推送最新诈骗预警，老人确认已读后同步到子女端</li>
+            <li><strong>摔倒检测</strong>：基于设备运动传感器，检测到异常时启动 SOS 倒计时自动求助</li>
           </ol>
           <div class="guide-tip">
             <p style="margin: 0;"><strong>提示：</strong>首次打开会显示角色选择。选"子女"后每次打开会直接进入子女端。点底部"设置"可随时切换。</p>

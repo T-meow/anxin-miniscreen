@@ -150,6 +150,76 @@ svg { flex-shrink: 0; }
 .elder-action.danger .action-icon-wrap { color: var(--danger); }
 .elder-action.muted .action-icon-wrap { color: var(--muted); }
 
+/* ========== 角色形象（Mascot） ========== */
+.elder-mascot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 16px 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.elder-mascot:active .mascot-face {
+  transform: scale(0.92);
+}
+.mascot-face {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fef0e4 0%, #fde8d0 100%);
+  border: 3px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(200,111,50,0.12);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  animation: mascotBounce 3s ease-in-out infinite;
+}
+.mascot-face svg { width: 56px; height: 56px; }
+.mascot-label {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* 表情动画 */
+@keyframes mascotBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.mascot-face.talking {
+  animation: mascotTalking 0.4s ease-in-out infinite;
+}
+@keyframes mascotTalking {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.04) translateY(-2px); }
+}
+.mascot-face.listening {
+  animation: mascotListening 2s ease-in-out infinite;
+}
+@keyframes mascotListening {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(3deg); }
+  75% { transform: rotate(-3deg); }
+}
+.mascot-face.thinking {
+  animation: mascotThinking 1.2s ease-in-out infinite;
+}
+@keyframes mascotThinking {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(5deg); }
+}
+.mascot-face.happy {
+  animation: mascotHappy 0.5s ease-in-out 3;
+}
+@keyframes mascotHappy {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
 /* ========== 全屏功能弹窗 ========== */
 .fullscreen-panel {
   position: fixed; inset: 0; z-index: 150;
@@ -228,6 +298,11 @@ svg { flex-shrink: 0; }
 .metric-card.monitor-card:hover { box-shadow: 0 4px 12px rgba(35,90,105,0.15); }
 .metric-card.monitor-card:active { transform: scale(0.98); }
 .monitor-icon { background: #e4f0f6; color: var(--brand); }
+.fraud-icon { background: #fff2df; color: var(--warning); }
+.fall-icon { background: #fde8e6; color: var(--danger); }
+.fraud-card { cursor: pointer; }
+.fraud-card:hover { box-shadow: 0 4px 12px rgba(230,126,34,0.15); }
+.fall-card { border-color: var(--rule); }
 
 /* 卡片通用 */
 .card {
@@ -275,6 +350,21 @@ input, select, textarea {
 }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(35,90,105,0.1); }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* 周期设置 */
+.cycle-section { margin-bottom: 12px; }
+.cycle-section > label { margin-bottom: 8px; }
+.cycle-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.cycle-tab {
+  flex: 1; padding: 8px 4px; border: 1px solid var(--rule); border-radius: 8px;
+  background: var(--bg2); font-size: 13px; cursor: pointer;
+  transition: all 0.15s ease; color: var(--muted);
+}
+.cycle-tab.active { background: var(--brand); color: white; border-color: var(--brand); }
+.cycle-tab:active { transform: scale(0.96); }
+.cycle-detail { padding: 10px; background: var(--bg); border-radius: 8px; }
+.cycle-hint { margin: 0; font-size: 13px; color: var(--muted); }
+.cycle-select { width: 100%; padding: 8px 12px; border: 1px solid var(--rule); border-radius: 6px; font-size: 14px; margin-top: 4px; }
 
 /* 通用按钮 */
 .btn-primary {
@@ -334,6 +424,41 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
 .modal-box h3 { font-size: 24px; margin-bottom: 12px; }
 .modal-box p { color: var(--muted); margin-bottom: 20px; }
 .modal-actions { display: flex; gap: 12px; justify-content: center; }
+
+/* 大弹窗：用于老人端功能入口 */
+.modal-large {
+  max-width: 640px;
+  width: 100%;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  text-align: left;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--rule);
+  flex-shrink: 0;
+}
+.modal-header h3 { margin: 0; font-size: 20px; }
+.btn-close {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--bg); border: none;
+  font-size: 18px; cursor: pointer; color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s ease;
+}
+.btn-close:hover { background: var(--rule); }
+.btn-close:active { transform: scale(0.92); }
+.modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  -webkit-overflow-scrolling: touch;
+}
 
 /* ========== 问助手 ========== */
 .assistant-chat { display: flex; flex-direction: column; gap: 12px; }
@@ -492,7 +617,21 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
   padding: 10px 14px; border-radius: 0 8px 8px 0; margin-bottom: 16px; font-size: 14px;
 }
 
-/* ========== 移动端适配 ========== */
+/* 吃药报告 & 语音留言 */
+.report-card { margin-bottom: 16px; }
+.voice-card { margin-bottom: 16px; }
+
+/* Toast 动画 */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* 移动端适配 */
 @media (max-width: 480px) {
   .screen { padding: 12px; }
   .elder-header { margin-bottom: 8px; }
@@ -504,6 +643,10 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
   .elder-actions { gap: 8px; }
   .elder-action { padding: 16px 8px 14px; font-size: 14px; gap: 6px; }
   .action-icon-wrap svg { width: 30px; height: 30px; }
+
+  .elder-mascot { margin-top: 14px; padding: 12px 0; }
+  .mascot-face { width: 76px; height: 76px; }
+  .mascot-face svg { width: 48px; height: 48px; }
 
   .role-picker-options { flex-direction: column; }
   .role-card { flex-direction: row; padding: 16px; gap: 14px; }
@@ -519,6 +662,8 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
   .elder-actions { gap: 6px; }
   .elder-action { padding: 14px 6px 12px; font-size: 13px; }
   .action-icon-wrap svg { width: 26px; height: 26px; }
+  .mascot-face { width: 68px; height: 68px; }
+  .mascot-face svg { width: 42px; height: 42px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

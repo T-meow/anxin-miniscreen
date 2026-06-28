@@ -117,6 +117,12 @@
           <span>简单设置</span>
         </button>
       </section>
+
+      <!-- 角色形象：状态表情 + 快捷入口 -->
+      <div class="elder-mascot" id="elder-mascot" onclick="Elder.tapMascot()">
+        <div class="mascot-face" id="mascot-face"></div>
+        <span class="mascot-label" id="mascot-label">点我说句话</span>
+      </div>
     </main>
 
     <!-- ======== 全屏功能弹窗（替代抽屉） ======== -->
@@ -195,6 +201,28 @@
             <p id="monitor-hint">点击查看老人端实时画面</p>
           </div>
         </article>
+        <!-- 反诈提醒卡片 -->
+        <article class="metric-card fraud-card" id="fraud-card" onclick="Family.showFraudPanel()">
+          <div class="metric-card-icon fraud-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M2 17l10 5 10-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M2 12l10 5 10-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="metric-card-body">
+            <span class="metric-label">反诈提醒</span>
+            <strong id="fraud-count">0 条</strong>
+            <p id="fraud-hint">暂无新提醒</p>
+          </div>
+        </article>
+        <!-- 摔倒检测卡片 -->
+        <article class="metric-card fall-card" id="fall-card">
+          <div class="metric-card-icon fall-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="5" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 23c0-4 2-7 4-7s4 3 4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 12l3 3 4-4 4 4 3-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="metric-card-body">
+            <span class="metric-label">摔倒检测</span>
+            <strong id="fall-status">正常</strong>
+            <p id="fall-hint">老人端运动监测中</p>
+          </div>
+        </article>
       </section>
 
       <!-- 操作区域：添加提醒 + 列表 -->
@@ -219,6 +247,7 @@
               类型
               <select id="input-type" name="type">
                 <option value="吃药">吃药</option>
+                <option value="打针">打针</option>
                 <option value="喝水">喝水</option>
                 <option value="复诊">复诊</option>
                 <option value="出门">出门</option>
@@ -229,6 +258,21 @@
               时间
               <input id="input-time" name="time" type="time">
             </label>
+          </div>
+
+          <!-- 周期设置 -->
+          <div class="cycle-section" id="cycle-section">
+            <label>提醒周期</label>
+            <div class="cycle-tabs">
+              <button type="button" class="cycle-tab active" data-cycle="daily" onclick="Family.setCycle('daily')">每天</button>
+              <button type="button" class="cycle-tab" data-cycle="weekly" onclick="Family.setCycle('weekly')">每周</button>
+              <button type="button" class="cycle-tab" data-cycle="monthly" onclick="Family.setCycle('monthly')">每月</button>
+              <button type="button" class="cycle-tab" data-cycle="custom" onclick="Family.setCycle('custom')">每N天</button>
+            </div>
+            <div class="cycle-detail" id="cycle-detail">
+              <!-- 默认每天，无需额外选项 -->
+              <p class="cycle-hint">每天同一时间提醒老人</p>
+            </div>
           </div>
           <label>
             给老人看的说明
@@ -253,6 +297,32 @@
           </div>
           <div class="reminder-list" id="family-reminder-list"></div>
         </section>
+      </section>
+
+      <!-- 吃药报告 -->
+      <section class="card report-card" id="report-card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <svg viewBox="0 0 20 20" width="20" height="20"><path d="M4 10h12M4 10l2-2m-2 2l2 2M16 10l-2-2m2 2l-2 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="6" y="3" width="8" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+            <h2>吃药报告（最近7天）</h2>
+          </div>
+        </div>
+        <div id="medication-report-body">
+          <p style="color: var(--muted); text-align: center; padding: 20px;">暂无用药提醒数据</p>
+        </div>
+      </section>
+
+      <!-- 语音留言 -->
+      <section class="card voice-card" id="voice-card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <svg viewBox="0 0 20 20" width="20" height="20"><path d="M10 2a3 3 0 013 3v4a3 3 0 01-6 0V5a3 3 0 013-3z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 9v1a5 5 0 0010 0V9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="15" x2="10" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <h2>语音留言</h2>
+          </div>
+        </div>
+        <div id="voice-message-list">
+          <p style="color: var(--muted); text-align: center; padding: 20px;">暂无语音留言</p>
+        </div>
       </section>
 
       <!-- 子女端返回老人端 -->
